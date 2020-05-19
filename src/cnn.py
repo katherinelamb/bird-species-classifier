@@ -30,7 +30,6 @@ else:
 
 print('using device:', device)
 
-
 # Set up a transform to preprocess the data by subtracting the mean RGB value and dividing by the
 # standard deviation of each RGB value
 transform = T.Compose(
@@ -71,7 +70,6 @@ def imshow(img, size=(10, 10)):
     plt.title("One mini batch")
     plt.axis("off")
     plt.pause(8)
-
 
 #dataiter = iter(trainloader)
 #images, labels = dataiter.next()

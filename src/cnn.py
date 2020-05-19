@@ -14,11 +14,14 @@ import torchvision.transforms as T
 import torchvision.datasets as dset
 from torchvision import models
 
+import os
+dir_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+data_path = os.path.join(dir_path, "data/100-bird-species")
 
 # Use GPU if applicable, taken from Assignment 2 notebook
 USE_GPU = True
 
-dtype = torch.float32 
+dtype = torch.float32
 
 if USE_GPU and torch.cuda.is_available():
     device = torch.device('cuda')
@@ -28,7 +31,7 @@ else:
 print('using device:', device)
 
 
-# Set up a transform to preprocess the data by subtracting the mean RGB value and dividing by the 
+# Set up a transform to preprocess the data by subtracting the mean RGB value and dividing by the
 # standard deviation of each RGB value
 transform = T.Compose(
     [T.ToTensor(),
@@ -36,13 +39,13 @@ transform = T.Compose(
 )
 
 # Load data
-trainset = dset.ImageFolder(root="../100-bird-species/train/", transform=transform)
+trainset = dset.ImageFolder(root=os.path.join(data_path, "train"), transform=transform)
 trainloader = DataLoader(trainset, batch_size=64, num_workers=0, shuffle=True)
 
-valset = torchvision.datasets.ImageFolder(root="../100-bird-species/valid/", transform=transform)
+valset = torchvision.datasets.ImageFolder(root=os.path.join(data_path, "valid"), transform=transform)
 valloader = DataLoader(valset, batch_size=64, num_workers=0, shuffle=False)
 
-testset = torchvision.datasets.ImageFolder(root="../100-bird-species/test/", transform=transform)
+testset = torchvision.datasets.ImageFolder(root=os.path.join(data_path, "test"), transform=transform)
 testloader = DataLoader(testset, batch_size=64, num_workers=0, shuffle=False)
 
 dataloaders = {
@@ -63,7 +66,7 @@ def imshow(img, size=(10, 10)):
     npimg = img.numpy()
     if size:
         plt.figure(figsize=size)
-    
+
     plt.imshow(np.transpose(npimg, (1, 2, 0)))
     plt.title("One mini batch")
     plt.axis("off")
@@ -82,7 +85,7 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
 
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
-    
+
 
     for epoch in range(num_epochs):
         print('Epoch {}/{}'.format(epoch, num_epochs - 1))
@@ -161,15 +164,15 @@ def vis_model(model, num_images=25):
     model.eval()
     images_so_far = 0
     figure, ax = plt.subplots(5, 5, figsize=(20, 20))
-    
-    
+
+
     with torch.no_grad():
         for i , (inputs, labels) in enumerate(dataloaders["test"]):
             inputs = inputs.to(device)
             labels = labels.to(device)
             outputs = model(inputs)
             _, preds = torch.max(outputs, 1)
-            
+
             for i in range(5):
                 for j in range(5):
                     if images_so_far < num_images:
